@@ -25,7 +25,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @AssignmentHints({"crypto-hashing.hints.1", "crypto-hashing.hints.2"})
 public class HashingAssignment implements AssignmentEndpoint {
-  public static final String[] SECRETS = {"secret", "admin", "password", "123456", "passw0rd"};
+  public static final String[] SECRETS = System.getenv("HASHING_SECRETS").split(",");
 
   @RequestMapping(path = "/crypto/hashing/md5", produces = MediaType.TEXT_HTML_VALUE)
   @ResponseBody
@@ -36,7 +36,7 @@ public class HashingAssignment implements AssignmentEndpoint {
 
       String secret = SECRETS[new Random().nextInt(SECRETS.length)];
 
-      MessageDigest md = MessageDigest.getInstance("MD5");
+      MessageDigest md = MessageDigest.getInstance("SHA-256");
       md.update(secret.getBytes());
       byte[] digest = md.digest();
       md5Hash = DatatypeConverter.printHexBinary(digest).toUpperCase();
