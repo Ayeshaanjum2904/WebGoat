@@ -12,7 +12,6 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Statement;
 
 import org.owasp.webgoat.container.LessonDataSource;
 import org.owasp.webgoat.container.assignments.AssignmentEndpoint;
@@ -56,22 +55,24 @@ public class SqlInjectionChallenge implements AssignmentEndpoint {
     if (attackResult.assignmentSolved()) {
 
       try (Connection connection = dataSource.getConnection()) {
-        String checkUserQuery =
-            "select userid from sql_challenge_users where userid = '" + username + "'";
-        Statement statement = connection.createStatement();
-        ResultSet resultSet = statement.executeQuery(checkUserQuery);
-
-        if (resultSet.next()) {
-          attackResult = failed(this).feedback("user.exists").feedbackArgs(username).build();
-        } else {
-          PreparedStatement preparedStatement =
-              connection.prepareStatement("INSERT INTO sql_challenge_users VALUES (?, ?, ?)");
+        String checkUserQuery = "SELECT userid FROM sql_challenge_users WHERE userid = ?";
+        try (PreparedStatement preparedStatement = connection.prepareStatement(checkUserQuery)) {
           preparedStatement.setString(1, username);
-          preparedStatement.setString(2, email);
-          preparedStatement.setString(3, password);
-          preparedStatement.execute();
-          attackResult =
-              informationMessage(this).feedback("user.created").feedbackArgs(username).build();
+          try (ResultSet resultSet = preparedStatement.executeQuery()) {
+            if (resultSet.next()) {
+              attackResult = failed(this).feedback("user.exists").feedbackArgs(username).build();
+            } else {
+              try (PreparedStatement insertStatement =
+                  connection.prepareStatement("INSERT INTO sql_challenge_users VALUES (?, ?, ?)")) {
+                insertStatement.setString(1, username);
+                insertStatement.setString(2, email);
+                insertStatement.setString(3, password);
+                insertStatement.execute();
+                attackResult =
+                    informationMessage(this).feedback("user.created").feedbackArgs(username).build();
+              }
+            }
+          }
         }
       } catch (SQLException e) {
         attackResult = failed(this).output("Something went wrong").build();
