@@ -25,7 +25,7 @@ import org.springframework.web.bind.annotation.RestController;
 })
 public class ActuatorExposureTask implements AssignmentEndpoint {
 
-  static final String LEAKED_API_KEY = "INTERNAL-API-KEY-987";
+  static final String LEAKED_API_KEY = System.getenv("INTERNAL_API_KEY");
 
   @GetMapping(
       value = "/SecurityMisconfiguration/task3/actuator/env",
@@ -54,7 +54,7 @@ public class ActuatorExposureTask implements AssignmentEndpoint {
       value = "/SecurityMisconfiguration/task3",
       consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
   public AttackResult submitApiKey(@RequestParam("apiKey") String apiKey) {
-    if (LEAKED_API_KEY.equals(apiKey)) {
+    if (LEAKED_API_KEY != null && LEAKED_API_KEY.equals(apiKey)) {
       return success(this)
           .feedback("securitymisconfiguration.task3.success")
           .output("Actuator endpoints now require authentication and are limited to ops network.")
