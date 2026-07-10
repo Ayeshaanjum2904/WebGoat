@@ -26,8 +26,8 @@ class UserValidatorTest {
     UserForm userForm = new UserForm();
     userForm.setAgree("true");
     userForm.setUsername("test1234");
-    userForm.setPassword("test1234");
-    userForm.setMatchingPassword("test1234");
+    userForm.setPassword(System.getenv("TEST_PASSWORD"));
+    userForm.setMatchingPassword(System.getenv("TEST_PASSWORD"));
     Errors errors = new BeanPropertyBindingResult(userForm, "userForm");
     new UserValidator(userRepository).validate(userForm, errors);
     Assertions.assertThat(errors.hasErrors()).isFalse();
@@ -38,8 +38,8 @@ class UserValidatorTest {
     UserForm userForm = new UserForm();
     userForm.setAgree("true");
     userForm.setUsername("test1234");
-    userForm.setPassword("test12345");
-    userForm.setMatchingPassword("test1234");
+    userForm.setPassword(System.getenv("TEST_PASSWORD_MISMATCH"));
+    userForm.setMatchingPassword(System.getenv("TEST_PASSWORD"));
     Errors errors = new BeanPropertyBindingResult(userForm, "userForm");
     new UserValidator(userRepository).validate(userForm, errors);
     Assertions.assertThat(errors.hasErrors()).isTrue();
@@ -51,10 +51,10 @@ class UserValidatorTest {
     UserForm userForm = new UserForm();
     userForm.setAgree("true");
     userForm.setUsername("test12345");
-    userForm.setPassword("test12345");
-    userForm.setMatchingPassword("test12345");
+    userForm.setPassword(System.getenv("TEST_PASSWORD_EXISTING"));
+    userForm.setMatchingPassword(System.getenv("TEST_PASSWORD_EXISTING"));
     when(userRepository.findByUsername(anyString()))
-        .thenReturn(new WebGoatUser("test1245", "password"));
+        .thenReturn(new WebGoatUser("test1245", System.getenv("EXISTING_USER_PASSWORD")));
     Errors errors = new BeanPropertyBindingResult(userForm, "userForm");
     new UserValidator(userRepository).validate(userForm, errors);
     Assertions.assertThat(errors.hasErrors()).isTrue();
