@@ -48,17 +48,7 @@ function ajaxFunction(userId) {
 }
 
 function escapeHtml(string) {
-    var entityMap = {
-        '&': '&amp;',
-        '<': '&lt;',
-        '>': '&gt;',
-        '"': '&quot;',
-        "'": '&#39;',
-        '/': '&#x2F;',
-        '`': '&#x60;',
-        '=': '&#x3D;'
-    };
-    return String(string).replace(/[&<>"]/g, function (s) {
-        return entityMap[s];
-    });
+    var div = document.createElement('div');
+    div.appendChild(document.createTextNode(string));
+    return div.innerHTML;
 }
