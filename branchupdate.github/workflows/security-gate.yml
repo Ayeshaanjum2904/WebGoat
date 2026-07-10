@@ -1,0 +1,28 @@
+name: "Production Security Gate — Agent Verification"
+
+on:
+  push:
+    branches:
+      - '*-remediation'
+
+jobs:
+  verify-agent-fixes:
+    name: "Audit Agent Remediation Code"
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: "Checkout Remediation Branch Code"
+        uses: actions/checkout@v4
+
+      - name: "Set up Python Environment"
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: "Install Open-Source Security Scanners"
+        run: |
+          pip install bandit
+
+      - name: "Perform High-Confidence Security Scan"
+        run: |
+          bandit -r . -ll -ii --format txt
