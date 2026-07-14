@@ -19,27 +19,15 @@ public class SerializationHelper {
   private static final char[] hexArray = "0123456789ABCDEF".toCharArray();
 
   public static Object fromString(String s) throws IOException, ClassNotFoundException {
+    Objects.requireNonNull(s, "Input string must not be null");
     byte[] data = Base64.getDecoder().decode(s);
-    try (ObjectInputStream ois = new ObjectInputStream(new ByteArrayInputStream(data)) {
-      @Override
-      protected void validateClass(Class<?> clazz) throws IOException {
-        if (!isSafeClass(clazz)) {
-          throw new IOException("Deserialization of unsafe class: " + clazz.getName());
-        }
-      }
-    }) {
-      Object o = ois.readObject();
-      return o;
+    try (ObjectInputStream ois = new SafeObjectInputStream(new ByteArrayInputStream(data))) {
+      return ois.readObject();
     }
   }
 
-  private static boolean isSafeClass(Class<?> clazz) {
-    // Add allowed classes here
-    return clazz == String.class || clazz == Integer.class || clazz == Long.class || clazz == Double.class || clazz == Boolean.class;
-  }
-
   public static String toString(Serializable o) throws IOException {
-    Objects.requireNonNull(o, "Object to serialize cannot be null");
+    Objects.requireNonNull(o, "Input object must not be null");
     ByteArrayOutputStream baos = new ByteArrayOutputStream();
     try (ObjectOutputStream oos = new ObjectOutputStream(baos)) {
       oos.writeObject(o);
@@ -64,5 +52,24 @@ public class SerializationHelper {
       hexChars[j * 2 + 1] = hexArray[v & 0x0F];
     }
     return new String(hexChars);
+  }
+
+  private static class SafeObjectInputStream extends ObjectInputStream {
+    public SafeObjectInputStream(ByteArrayInputStream in) throws IOException {
+      super(in);
+    }
+
+    @Override
+    protected Class<?> resolveClass(java.io.ObjectStreamClass desc) throws IOException, ClassNotFoundException {
+      String className = desc.getName();
+      if (!isAllowedClass(className)) {
+        throw new ClassNotFoundException("Deserialization of class " + className + " is not allowed.");
+      }
+      return super.resolveClass(desc);
+    }
+
+    private boolean isAllowedClass(String className) {
+      return className.startsWith("java.") || className.startsWith("javax.") || className.equals("org.owasp.webgoat.lessons.deserialization.AllowedClass");
+    }
   }
 }
