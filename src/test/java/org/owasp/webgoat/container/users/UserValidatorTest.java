@@ -51,8 +51,8 @@ class UserValidatorTest {
     UserForm userForm = new UserForm();
     userForm.setAgree("true");
     userForm.setUsername("test12345");
-    userForm.setPassword(System.getenv("TEST_PASSWORD_EXISTING"));
-    userForm.setMatchingPassword(System.getenv("TEST_PASSWORD_EXISTING"));
+    userForm.setPassword(System.getenv("TEST_PASSWORD_EXISTING_USER"));
+    userForm.setMatchingPassword(System.getenv("TEST_PASSWORD_EXISTING_USER"));
     when(userRepository.findByUsername(anyString()))
         .thenReturn(new WebGoatUser("test1245", System.getenv("EXISTING_USER_PASSWORD")));
     Errors errors = new BeanPropertyBindingResult(userForm, "userForm");
