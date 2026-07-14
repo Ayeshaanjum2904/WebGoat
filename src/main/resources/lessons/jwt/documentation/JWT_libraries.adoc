@@ -27,14 +27,9 @@ claims:
 ----
 import java.util.Map;
 
-var token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.NFvYpuwbF6YWbPyaNAGEPw9wbhiQSovvSrD89B8K7Ng";
+var token = System.getenv("JWT_TOKEN_1");
 
-String signingKey = System.getenv("JWT_SIGNING_KEY");
-if (signingKey == null || signingKey.isEmpty()) {
-    throw new IllegalStateException("Environment variable JWT_SIGNING_KEY is not set.");
-}
-
-Jwts.parser().setSigningKey(signingKey).parseClaimsJws(token);
+Jwts.parser().setSigningKey(System.getenv("JWT_SIGNING_KEY_1")).parseClaimsJws(token);
 ----
 
 will work!
@@ -44,14 +39,9 @@ Using the same source as above gives:
 
 [source]
 ----
-var token = " eyJhbGciOiJub25lIiwidHlwIjoiSldUIn0.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.NFvYpuwbF6YWbPyaNAGEPw9wbhiQSovvSrD89B8K7Ng";
+var token = System.getenv("JWT_TOKEN_2");
 
-String signingKey = System.getenv("JWT_SIGNING_KEY");
-if (signingKey == null || signingKey.isEmpty()) {
-    throw new IllegalStateException("Environment variable JWT_SIGNING_KEY is not set.");
-}
-
-Jwts.parser().setSigningKey(signingKey).parseClaimsJws(token);
+Jwts.parser().setSigningKey(System.getenv("JWT_SIGNING_KEY_2")).parseClaimsJws(token);
 ----
 
 will result in:
@@ -67,12 +57,7 @@ removing the signature completely (leaving the last `.`)
 ----
 var token = "eyJhbGciOiJub25lIiwidHlwIjoiSldUIn0.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.";
 
-String signingKey = System.getenv("JWT_SIGNING_KEY");
-if (signingKey == null || signingKey.isEmpty()) {
-    throw new IllegalStateException("Environment variable JWT_SIGNING_KEY is not set.");
-}
-
-Jwts.parser().setSigningKey(signingKey).parseClaimsJws(token);
+Jwts.parser().setSigningKey("test").parseClaimsJws(token);
 ----
 
 will result in:
