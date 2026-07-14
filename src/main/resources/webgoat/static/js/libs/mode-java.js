@@ -43,6 +43,7 @@ DocCommentHighlightRules.getEndRule = function (start) {
     };
 };
 
+
 exports.DocCommentHighlightRules = DocCommentHighlightRules;
 
 });
@@ -53,7 +54,7 @@ ace.define("ace/mode/javascript_highlight_rules",["require","exports","module","
 var oop = require("../lib/oop");
 var DocCommentHighlightRules = require("./doc_comment_highlight_rules").DocCommentHighlightRules;
 var TextHighlightRules = require("./text_highlight_rules").TextHighlightRules;
-var identifierRe = "[a-zA-Z\\$_\\u00a1-\\uffff][a-zA-Z\\d\\$_\\u00a1-\\uffff]*";
+var identifierRe = "[a-zA-Z\\$_\u00a1-\uffff][a-zA-Z\\d\\$_\u00a1-\uffff]*";
 
 var JavaScriptHighlightRules = function(options) {
     var keywordMapper = this.createKeywordMapper({
