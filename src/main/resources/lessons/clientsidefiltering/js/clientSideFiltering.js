@@ -21,34 +21,35 @@ function fetchUserData() {
 
 function ajaxFunction(userId) {
     $.get("clientSideFiltering/salaries?userId=" + encodeURIComponent(userId), function (result, status) {
-        var html = "<table border = '1' width = '90%' align = 'center'>";
-        html += '<tr>';
-        html += '<td>UserID</td>';
-        html += '<td>First Name</td>';
-        html += '<td>Last Name</td>';
-        html += '<td>SSN</td>';
-        html += '<td>Salary</td>';
+        var html = document.createElement("table");
+        html.setAttribute("border", "1");
+        html.setAttribute("width", "90%");
+        html.setAttribute("align", "center");
+
+        var headerRow = document.createElement("tr");
+        ["UserID", "First Name", "Last Name", "SSN", "Salary"].forEach(function (header) {
+            var th = document.createElement("td");
+            th.textContent = header;
+            headerRow.appendChild(th);
+        });
+        html.appendChild(headerRow);
 
         for (var i = 0; i < result.length; i++) {
-            html += '<tr id = "' + encodeURIComponent(result[i].UserID) + '">';
-            html += '<td>' + escapeHtml(result[i].UserID) + '</td>';
-            html += '<td>' + escapeHtml(result[i].FirstName) + '</td>';
-            html += '<td>' + escapeHtml(result[i].LastName) + '</td>';
-            html += '<td>' + escapeHtml(result[i].SSN) + '</td>';
-            html += '<td>' + escapeHtml(result[i].Salary) + '</td>';
-            html += '</tr>';
+            var row = document.createElement("tr");
+            row.setAttribute("id", result[i].UserID);
+
+            [result[i].UserID, result[i].FirstName, result[i].LastName, result[i].SSN, result[i].Salary].forEach(function (cellData) {
+                var td = document.createElement("td");
+                td.textContent = cellData;
+                row.appendChild(td);
+            });
+
+            html.appendChild(row);
         }
-        html += '</table>';
 
         var newdiv = document.createElement("div");
-        newdiv.innerHTML = html;
+        newdiv.appendChild(html);
         var container = document.getElementById("hiddenEmployeeRecords");
         container.appendChild(newdiv);
     });
-}
-
-function escapeHtml(string) {
-    var div = document.createElement('div');
-    div.appendChild(document.createTextNode(string));
-    return div.innerHTML;
 }
