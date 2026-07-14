@@ -21,7 +21,7 @@ function fetchUserData() {
 
 function ajaxFunction(userId) {
     $.get("clientSideFiltering/salaries?userId=" + encodeURIComponent(userId), function (result, status) {
-        var html = "<table border='1' width='90%' align='center'>";
+        var html = "<table border = '1' width = '90%' align = 'center'>";
         html += '<tr>';
         html += '<td>UserID</td>';
         html += '<td>First Name</td>';
@@ -30,7 +30,7 @@ function ajaxFunction(userId) {
         html += '<td>Salary</td>';
 
         for (var i = 0; i < result.length; i++) {
-            html += '<tr id="' + encodeURIComponent(result[i].UserID) + '">';
+            html += '<tr id = "' + encodeURIComponent(result[i].UserID) + '">';
             html += '<td>' + escapeHtml(result[i].UserID) + '</td>';
             html += '<td>' + escapeHtml(result[i].FirstName) + '</td>';
             html += '<td>' + escapeHtml(result[i].LastName) + '</td>';
