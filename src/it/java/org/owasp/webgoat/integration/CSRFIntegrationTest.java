@@ -44,7 +44,7 @@ public class CSRFIntegrationTest extends IntegrationTest {
 
   private static final String trickHTML7 =
       "<!DOCTYPE html><html><body><form action=\"WEBGOATURL\" enctype=\"application/x-www-form-urlencoded\" method=\"POST\">\n"
-          + "<input type=\"hidden\" name=\"feedback\" value=\"WebGoat is the best!!\"/>\n"
+          + "<input type=\"hidden\" name=\"data\" value=\"{\"name\":\"WebGoat\",\"email\":\"webgoat@webgoat.org\",\"content\":\"WebGoat is the best!!\"}\" />\n"
           + "<input type=\"submit\" value=\"assignment 7\"/>\n"
           + "</form></body></html>";
 
