@@ -56,23 +56,21 @@ public class SqlInjectionChallenge implements AssignmentEndpoint {
 
       try (Connection connection = dataSource.getConnection()) {
         String checkUserQuery = "SELECT userid FROM sql_challenge_users WHERE userid = ?";
-        try (PreparedStatement statement = connection.prepareStatement(checkUserQuery)) {
-          statement.setString(1, username);
-          try (ResultSet resultSet = statement.executeQuery()) {
-            if (resultSet.next()) {
-              attackResult = failed(this).feedback("user.exists").feedbackArgs(username).build();
-            } else {
-              try (PreparedStatement preparedStatement =
-                  connection.prepareStatement("INSERT INTO sql_challenge_users VALUES (?, ?, ?)")) {
-                preparedStatement.setString(1, username);
-                preparedStatement.setString(2, email);
-                preparedStatement.setString(3, password);
-                preparedStatement.execute();
-                attackResult =
-                    informationMessage(this).feedback("user.created").feedbackArgs(username).build();
-              }
-            }
-          }
+        PreparedStatement checkUserStatement = connection.prepareStatement(checkUserQuery);
+        checkUserStatement.setString(1, username);
+        ResultSet resultSet = checkUserStatement.executeQuery();
+
+        if (resultSet.next()) {
+          attackResult = failed(this).feedback("user.exists").feedbackArgs(username).build();
+        } else {
+          PreparedStatement preparedStatement =
+              connection.prepareStatement("INSERT INTO sql_challenge_users VALUES (?, ?, ?)");
+          preparedStatement.setString(1, username);
+          preparedStatement.setString(2, email);
+          preparedStatement.setString(3, password);
+          preparedStatement.execute();
+          attackResult =
+              informationMessage(this).feedback("user.created").feedbackArgs(username).build();
         }
       } catch (SQLException e) {
         attackResult = failed(this).output("Something went wrong").build();
