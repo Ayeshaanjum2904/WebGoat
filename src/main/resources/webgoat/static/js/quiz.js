@@ -25,8 +25,8 @@ $(function () {
                   html += "<div id='question_" + j + "' class='quiz_question' name='question'><p>" + (j+1) + ".&nbsp;" + escapeHtml(quest.text) + "</p>";
                   html += "<fieldset>";
                   $.each(quest.solutions, function(k, solution) {
-                    solution = "Solution " + k + ": " + solution;
-                    html += '<input id="question_' + j + '_' + k + '_input" type="radio" name="question_' + j +'_solution" value="' + escapeHtml(solution) + '" required><label for="question_' + j + '_' + k + '_input">' + escapeHtml(solution) + '</label><br>';
+                    solution = "Solution " + k + ": " + escapeHtml(solution);
+                    html += '<input id="question_' + j + '_' + k + '_input" type="radio" name="question_' + j +'_solution" value="' + solution + '" required><label for="question_' + j + '_' + k + '_input">' + solution + '</label><br>';
                   });
                   html += "</fieldset></div>";
                 });
@@ -58,16 +58,11 @@ function getFeedback(context) {
     }); // end ajax-done
 } // end getFeedback
 
-function escapeHtml(str) {
-    return str.replace(/[&<>'"`]/g, function(match) {
-        const escapeMap = {
-            '&': '&amp;',
-            '<': '&lt;',
-            '>': '&gt;',
-            "'": '&#39;',
-            '"': '&quot;',
-            '`': '&#96;'
-        };
-        return escapeMap[match];
-    });
+function escapeHtml(unsafe) {
+    return unsafe
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
 }
