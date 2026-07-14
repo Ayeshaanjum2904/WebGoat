@@ -21,7 +21,7 @@ public class SerializationHelper {
   public static Object fromString(String s) throws IOException, ClassNotFoundException {
     Objects.requireNonNull(s, "Input string must not be null");
     byte[] data = Base64.getDecoder().decode(s);
-    try (ObjectInputStream ois = new SafeObjectInputStream(new ByteArrayInputStream(data))) {
+    try (ObjectInputStream ois = new SecureObjectInputStream(new ByteArrayInputStream(data))) {
       return ois.readObject();
     }
   }
@@ -54,8 +54,8 @@ public class SerializationHelper {
     return new String(hexChars);
   }
 
-  private static class SafeObjectInputStream extends ObjectInputStream {
-    public SafeObjectInputStream(ByteArrayInputStream in) throws IOException {
+  private static class SecureObjectInputStream extends ObjectInputStream {
+    public SecureObjectInputStream(ByteArrayInputStream in) throws IOException {
       super(in);
     }
 
@@ -63,7 +63,7 @@ public class SerializationHelper {
     protected Class<?> resolveClass(java.io.ObjectStreamClass desc) throws IOException, ClassNotFoundException {
       String className = desc.getName();
       if (!isAllowedClass(className)) {
-        throw new ClassNotFoundException("Deserialization of class " + className + " is not allowed.");
+        throw new ClassNotFoundException("Unauthorized deserialization attempt for class: " + className);
       }
       return super.resolveClass(desc);
     }
