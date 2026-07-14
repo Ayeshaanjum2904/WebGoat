@@ -7,13 +7,17 @@ function login(user) {
         type: 'POST',
         url: 'JWT/refresh/login',
         contentType: "application/json",
-        data: JSON.stringify({user: user, password: process.env.JWT_PASSWORD})
+        data: JSON.stringify({user: user, password: getPasswordFromEnv()})
     }).success(
         function (response) {
             localStorage.setItem('access_token', response['access_token']);
             localStorage.setItem('refresh_token', response['refresh_token']);
         }
     )
+}
+
+function getPasswordFromEnv() {
+    return process.env.JWT_REFRESH_PASSWORD || '';
 }
 
 //Dev comment: Pass token as header as we had an issue with tokens ending up in the access_log
