@@ -89,7 +89,6 @@ public class CSRFIntegrationTest extends IntegrationTest {
   }
 
   private void uploadTrickHtml(String htmlName, String htmlContent) throws IOException {
-
     Path webWolfFilePath = Paths.get(webwolfFileDir);
     if (webWolfFilePath.resolve(Paths.get(this.getUser(), htmlName)).toFile().exists()) {
       Files.delete(webWolfFilePath.resolve(Paths.get(this.getUser(), htmlName)));
