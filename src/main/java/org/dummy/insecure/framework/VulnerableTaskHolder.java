@@ -79,7 +79,7 @@ public class VulnerableTaskHolder implements Serializable {
   }
 
   private void validateTaskAction(String taskAction) {
-    String allowedPattern = "^(sleep|ping)(\s+\S+)*$";
+    String allowedPattern = "^(sleep|ping)(\s+\d+)?$";
     if (!Pattern.matches(allowedPattern, taskAction)) {
       throw new IllegalArgumentException("Invalid task action");
     }
