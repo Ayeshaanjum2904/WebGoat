@@ -24,7 +24,7 @@ public class RegistrationUITest extends PlaywrightTest {
     loginPage.login(Authentication.getTweety().name(), System.getenv("TWEETY_PASSWORD"));
 
     var newUsername = "newuser" + System.currentTimeMillis();
-    var password = System.getenv("NEW_USER_PASSWORD");
+    var password = System.getenv("DEFAULT_USER_PASSWORD");
     var registrationPage = new RegistrationPage(page);
     registrationPage.open();
     registrationPage.register(newUsername, password);
@@ -40,7 +40,7 @@ public class RegistrationUITest extends PlaywrightTest {
     registrationPage.open();
 
     var newUsername = "newuser" + System.currentTimeMillis();
-    var password = System.getenv("NEW_USER_PASSWORD");
+    var password = System.getenv("DEFAULT_USER_PASSWORD");
     registrationPage.register(newUsername, password);
 
     assertThat(page.content()).contains(newUsername);
