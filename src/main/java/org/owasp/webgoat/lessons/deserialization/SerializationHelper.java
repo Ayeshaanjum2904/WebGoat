@@ -69,7 +69,7 @@ public class SerializationHelper {
     }
 
     private boolean isAllowedClass(String className) {
-      return className.startsWith("java.lang.") || className.startsWith("java.util.");
+      return className.startsWith("java.") || className.startsWith("javax.") || className.equals("org.owasp.webgoat.lessons.deserialization.AllowedClass");
     }
   }
 }
