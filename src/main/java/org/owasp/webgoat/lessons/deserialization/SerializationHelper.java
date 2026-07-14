@@ -19,28 +19,27 @@ public class SerializationHelper {
   private static final char[] hexArray = "0123456789ABCDEF".toCharArray();
 
   public static Object fromString(String s) throws IOException, ClassNotFoundException {
-    Objects.requireNonNull(s, "Input string cannot be null");
     byte[] data = Base64.getDecoder().decode(s);
     try (ObjectInputStream ois = new ObjectInputStream(new ByteArrayInputStream(data)) {
       @Override
-      protected Class<?> resolveClass(java.io.ObjectStreamClass desc) throws IOException, ClassNotFoundException {
-        String className = desc.getName();
-        if (!isAllowedClass(className)) {
-          throw new ClassNotFoundException("Deserialization of class " + className + " is not allowed");
+      protected void validateClass(Class<?> clazz) throws IOException {
+        if (!isSafeClass(clazz)) {
+          throw new IOException("Deserialization of unsafe class: " + clazz.getName());
         }
-        return super.resolveClass(desc);
       }
     }) {
-      return ois.readObject();
+      Object o = ois.readObject();
+      return o;
     }
   }
 
-  private static boolean isAllowedClass(String className) {
-    return className.startsWith("java.util.") || className.startsWith("java.lang.");
+  private static boolean isSafeClass(Class<?> clazz) {
+    // Add allowed classes here
+    return clazz == String.class || clazz == Integer.class || clazz == Long.class || clazz == Double.class || clazz == Boolean.class;
   }
 
   public static String toString(Serializable o) throws IOException {
-    Objects.requireNonNull(o, "Input object cannot be null");
+    Objects.requireNonNull(o, "Object to serialize cannot be null");
     ByteArrayOutputStream baos = new ByteArrayOutputStream();
     try (ObjectOutputStream oos = new ObjectOutputStream(baos)) {
       oos.writeObject(o);
