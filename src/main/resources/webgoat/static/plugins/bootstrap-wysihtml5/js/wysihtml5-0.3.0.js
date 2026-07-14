@@ -32,17 +32,9 @@ var wysihtml5 = {
   ESCAPE_KEY:     27,
   SPACE_KEY:      32,
   DELETE_KEY:     46
-};/**
- * @license Rangy, a cross-browser JavaScript range and selection library
- * http://code.google.com/p/rangy/
- *
- * Copyright 2011, Tim Down
- * Licensed under the MIT license.
- * Version: 1.2.2
- * Build date: 13 November 2011
- */
-window['rangy'] = (function() {
+};
 
+window['rangy'] = (function() {
 
     var OBJECT = "object", FUNCTION = "function", UNDEFINED = "undefined";
 
@@ -55,14 +47,9 @@ window['rangy'] = (function() {
 
     var textRangeProperties = ["boundingHeight", "boundingLeft", "boundingTop", "boundingWidth", "htmlText", "text"];
 
-    // Subset of TextRange's full set of methods that we're interested in
     var textRangeMethods = ["collapse", "compareEndPoints", "duplicate", "getBookmark", "moveToBookmark",
         "moveToElementText", "parentElement", "pasteHTML", "select", "setEndPoint", "getBoundingClientRect"];
 
-    /*----------------------------------------------------------------------------------------------------------------*/
-
-    // Trio of functions taken from Peter Michaux's article:
-    // http://peter.michaux.ca/articles/feature-detection-state-of-the-art-browser-scripting
     function isHostMethod(o, p) {
         var t = typeof o[p];
         return t == FUNCTION || (!!(t == OBJECT && o[p])) || t == "unknown";
@@ -76,7 +63,6 @@ window['rangy'] = (function() {
         return typeof o[p] != UNDEFINED;
     }
 
-    // Creates a convenience function to save verbose repeated calls to tests functions
     function createMultiplePropertyTest(testFunc) {
         return function(o, props) {
             var i = props.length;
@@ -89,7 +75,6 @@ window['rangy'] = (function() {
         };
     }
 
-    // Next trio of functions are a convenience to save verbose repeated calls to previous two functions
     var areHostMethods = createMultiplePropertyTest(isHostMethod);
     var areHostObjects = createMultiplePropertyTest(isHostObject);
     var areHostProperties = createMultiplePropertyTest(isHostProperty);
@@ -156,15 +141,12 @@ window['rangy'] = (function() {
     var initListeners = [];
     var moduleInitializers = [];
 
-    // Initialization
     function init() {
         if (api.initialized) {
             return;
         }
         var testRange;
         var implementsDomRange = false, implementsTextRange = false;
-
-        // First, perform basic feature tests
 
         if (isHostMethod(document, "createRange")) {
             testRange = document.createRange();
@@ -190,4 +172,11 @@ window['rangy'] = (function() {
         api.initialized = true;
         api.features = {
             implementsDomRange: implementsDomRange,
-            implementsTextRange: impl
+            implementsTextRange: implementsTextRange
+        };
+    }
+
+    api.init = init;
+
+    return api;
+})();
