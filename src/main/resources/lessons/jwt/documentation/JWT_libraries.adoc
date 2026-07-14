@@ -25,14 +25,11 @@ claims:
 
 [source]
 ----
+import java.util.Base64;
 import java.util.Map;
 
-var token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.NFvYpuwbF6YWbPyaNAGEPw9wbhiQSovvSrD89B8K7Ng";
-
-String signingKey = System.getenv("JWT_SIGNING_KEY");
-if (signingKey == null || signingKey.isEmpty()) {
-    throw new IllegalStateException("Environment variable JWT_SIGNING_KEY is not set.");
-}
+var token = System.getenv("JWT_TOKEN");
+var signingKey = System.getenv("JWT_SIGNING_KEY");
 
 Jwts.parser().setSigningKey(signingKey).parseClaimsJws(token);
 ----
@@ -44,12 +41,8 @@ Using the same source as above gives:
 
 [source]
 ----
-var token = " eyJhbGciOiJub25lIiwidHlwIjoiSldUIn0.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.NFvYpuwbF6YWbPyaNAGEPw9wbhiQSovvSrD89B8K7Ng";
-
-String signingKey = System.getenv("JWT_SIGNING_KEY");
-if (signingKey == null || signingKey.isEmpty()) {
-    throw new IllegalStateException("Environment variable JWT_SIGNING_KEY is not set.");
-}
+var token = System.getenv("JWT_TOKEN_NONE");
+var signingKey = System.getenv("JWT_SIGNING_KEY");
 
 Jwts.parser().setSigningKey(signingKey).parseClaimsJws(token);
 ----
@@ -65,12 +58,8 @@ removing the signature completely (leaving the last `.`)
 
 [source]
 ----
-var token = "eyJhbGciOiJub25lIiwidHlwIjoiSldUIn0.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.";
-
-String signingKey = System.getenv("JWT_SIGNING_KEY");
-if (signingKey == null || signingKey.isEmpty()) {
-    throw new IllegalStateException("Environment variable JWT_SIGNING_KEY is not set.");
-}
+var token = System.getenv("JWT_TOKEN_UNSIGNED");
+var signingKey = System.getenv("JWT_SIGNING_KEY");
 
 Jwts.parser().setSigningKey(signingKey).parseClaimsJws(token);
 ----
