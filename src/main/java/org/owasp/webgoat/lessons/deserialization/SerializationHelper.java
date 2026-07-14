@@ -26,7 +26,7 @@ public class SerializationHelper {
       protected Class<?> resolveClass(java.io.ObjectStreamClass desc) throws IOException, ClassNotFoundException {
         String className = desc.getName();
         if (!isAllowedClass(className)) {
-          throw new ClassNotFoundException("Unauthorized deserialization attempt for class: " + className);
+          throw new ClassNotFoundException("Deserialization of class " + className + " is not allowed");
         }
         return super.resolveClass(desc);
       }
@@ -36,7 +36,7 @@ public class SerializationHelper {
   }
 
   private static boolean isAllowedClass(String className) {
-    return className.equals("java.util.ArrayList") || className.equals("java.util.HashMap");
+    return className.startsWith("java.util.") || className.startsWith("java.lang.");
   }
 
   public static String toString(Serializable o) throws IOException {
