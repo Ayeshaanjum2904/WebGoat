@@ -57,11 +57,11 @@ COPY --from=jre /jre ${JAVA_HOME}
 
 RUN chmod +x /config/start_webgoat.sh /config/start_zap.sh
 
-# Add a non-root user and switch to it
+# Add non-root user and switch to it
 RUN useradd -r appuser
 USER appuser
 
-# Add a HEALTHCHECK instruction
+# Add HEALTHCHECK instruction
 HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 CMD curl -f http://localhost:8080 || exit 1
 
 WORKDIR /config/Desktop
