@@ -135,4 +135,4 @@ var JavaScriptHighlightRules = function(options) {
                 token : [
                     "storage.type", "punctuation.operator", "entity.name.function", "text",
                     "keyword.operator", "text",
-                    "storage.type", "te
+                    "storage.type", "t
