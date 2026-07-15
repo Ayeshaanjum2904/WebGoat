@@ -55,9 +55,9 @@ removing the signature completely (leaving the last `.`)
 
 [source]
 ----
-var token = "eyJhbGciOiJub25lIiwidHlwIjoiSldUIn0.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.";
+var token = System.getenv("JWT_TOKEN_3");
 
-Jwts.parser().setSigningKey("test").parseClaimsJws(token);
+Jwts.parser().setSigningKey(System.getenv("JWT_SIGNING_KEY_3")).parseClaimsJws(token);
 ----
 
 will result in:
