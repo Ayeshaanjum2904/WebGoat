@@ -33,7 +33,7 @@ public class ChallengeIntegrationTest extends IntegrationTest {
     Map<String, Object> params = new HashMap<>();
     params.clear();
     params.put("username", "admin");
-    params.put("password", "!!webgoat_admin_1234!!".replace("1234", pincode));
+    params.put("password", System.getenv("CHALLENGE1_PASSWORD").replace("1234", pincode));
 
     checkAssignment(webGoatUrlConfig.url("challenge/1"), params, true);
     String result =
@@ -63,7 +63,7 @@ public class ChallengeIntegrationTest extends IntegrationTest {
     Map<String, Object> params = new HashMap<>();
     params.clear();
     params.put("username_login", "Larry");
-    params.put("password_login", "secure_password");
+    params.put("password_login", System.getenv("CHALLENGE5_PASSWORD"));
 
     String result =
         RestAssured.given()
