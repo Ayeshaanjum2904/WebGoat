@@ -25,9 +25,11 @@ claims:
 
 [source]
 ----
-var token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.NFvYpuwbF6YWbPyaNAGEPw9wbhiQSovvSrD89B8K7Ng";
+import java.util.Map;
 
-Jwts.parser().setSigningKey("test").parseClaimsJws(token);
+var token = System.getenv("JWT_TOKEN_1");
+
+Jwts.parser().setSigningKey(System.getenv("JWT_SIGNING_KEY_1")).parseClaimsJws(token);
 ----
 
 will work!
@@ -37,9 +39,9 @@ Using the same source as above gives:
 
 [source]
 ----
-var token = " eyJhbGciOiJub25lIiwidHlwIjoiSldUIn0.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.NFvYpuwbF6YWbPyaNAGEPw9wbhiQSovvSrD89B8K7Ng";
+var token = System.getenv("JWT_TOKEN_2");
 
-Jwts.parser().setSigningKey("test").parseClaimsJws(token);
+Jwts.parser().setSigningKey(System.getenv("JWT_SIGNING_KEY_2")).parseClaimsJws(token);
 ----
 
 will result in:
@@ -53,9 +55,9 @@ removing the signature completely (leaving the last `.`)
 
 [source]
 ----
-var token = "eyJhbGciOiJub25lIiwidHlwIjoiSldUIn0.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.";
+var token = System.getenv("JWT_TOKEN_3");
 
-Jwts.parser().setSigningKey("test").parseClaimsJws(token);
+Jwts.parser().setSigningKey(System.getenv("JWT_SIGNING_KEY_3")).parseClaimsJws(token);
 ----
 
 will result in:

@@ -25,7 +25,7 @@ public class DeserializationIntegrationTest extends IntegrationTest {
     if (OS.indexOf("win") > -1) {
       params.put(
           "token",
-          SerializationHelper.toString(new VulnerableTaskHolder("wait", "ping localhost -n 5")));
+          SerializationHelper.toString(new VulnerableTaskHolder("wait", "ping 127.0.0.1 -n 5")));
     } else {
       params.put(
           "token", SerializationHelper.toString(new VulnerableTaskHolder("wait", "sleep 5")));

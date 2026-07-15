@@ -10,6 +10,7 @@ import java.io.InputStreamReader;
 import java.io.ObjectInputStream;
 import java.io.Serializable;
 import java.time.LocalDateTime;
+import java.util.regex.Pattern;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
@@ -64,7 +65,11 @@ public class VulnerableTaskHolder implements Serializable {
         && taskAction.length() < 22) {
       log.info("about to execute: {}", taskAction);
       try {
-        Process p = Runtime.getRuntime().exec(taskAction);
+        validateTaskAction(taskAction);
+        String[] command = taskAction.split("\\s+");
+        ProcessBuilder processBuilder = new ProcessBuilder(command);
+        processBuilder.redirectErrorStream(true);
+        Process p = processBuilder.start();
         BufferedReader in = new BufferedReader(new InputStreamReader(p.getInputStream()));
         String line = null;
         while ((line = in.readLine()) != null) {
@@ -73,6 +78,13 @@ public class VulnerableTaskHolder implements Serializable {
       } catch (IOException e) {
         log.error("IO Exception", e);
       }
+    }
+  }
+
+  private void validateTaskAction(String taskAction) {
+    String allowedPattern = "^(sleep|ping)(\\s+\\S+)*$";
+    if (!Pattern.matches(allowedPattern, taskAction)) {
+      throw new IllegalArgumentException("Invalid task action");
     }
   }
 }
