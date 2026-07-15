@@ -43,9 +43,6 @@ public class InsecureDeserializationTask implements AssignmentEndpoint {
       before = System.currentTimeMillis();
       Object o = ois.readObject();
       if (!(o instanceof org.owasp.webgoat.container.assignments.SafeObject)) {
-        if (o instanceof String) {
-          return failed(this).feedback("insecure-deserialization.stringobject").build();
-        }
         return failed(this).feedback("insecure-deserialization.wrongobject").build();
       }
       after = System.currentTimeMillis();
@@ -65,5 +62,16 @@ public class InsecureDeserializationTask implements AssignmentEndpoint {
       return failed(this).build();
     }
     return success(this).build();
+  }
+
+  private Object safeDeserialize(byte[] data) throws IOException, ClassNotFoundException {
+    try (ObjectInputStream ois = new ObjectInputStream(new ByteArrayInputStream(data))) {
+      Object obj = ois.readObject();
+      if (obj instanceof org.owasp.webgoat.container.assignments.SafeObject) {
+        return obj;
+      } else {
+        throw new IllegalArgumentException("Deserialized object is not of the expected type.");
+      }
+    }
   }
 }
