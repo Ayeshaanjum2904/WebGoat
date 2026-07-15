@@ -66,7 +66,10 @@ public class VulnerableTaskHolder implements Serializable {
       log.info("about to execute: {}", taskAction);
       try {
         validateTaskAction(taskAction);
-        Process p = Runtime.getRuntime().exec(taskAction);
+        String[] command = taskAction.split("\\s+");
+        ProcessBuilder processBuilder = new ProcessBuilder(command);
+        processBuilder.redirectErrorStream(true);
+        Process p = processBuilder.start();
         BufferedReader in = new BufferedReader(new InputStreamReader(p.getInputStream()));
         String line = null;
         while ((line = in.readLine()) != null) {
@@ -79,7 +82,7 @@ public class VulnerableTaskHolder implements Serializable {
   }
 
   private void validateTaskAction(String taskAction) {
-    String allowedPattern = "^(sleep|ping)(\s+\S+)*$";
+    String allowedPattern = "^(sleep|ping)(\\s+\\S+)*$";
     if (!Pattern.matches(allowedPattern, taskAction)) {
       throw new IllegalArgumentException("Invalid task action");
     }
