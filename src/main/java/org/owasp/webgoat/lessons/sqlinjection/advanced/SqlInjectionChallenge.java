@@ -63,12 +63,12 @@ public class SqlInjectionChallenge implements AssignmentEndpoint {
         if (resultSet.next()) {
           attackResult = failed(this).feedback("user.exists").feedbackArgs(username).build();
         } else {
-          PreparedStatement preparedStatement =
-              connection.prepareStatement("INSERT INTO sql_challenge_users VALUES (?, ?, ?)");
+          String insertUserQuery = "INSERT INTO sql_challenge_users (userid, email, password) VALUES (?, ?, ?)";
+          PreparedStatement preparedStatement = connection.prepareStatement(insertUserQuery);
           preparedStatement.setString(1, username);
           preparedStatement.setString(2, email);
           preparedStatement.setString(3, password);
-          preparedStatement.execute();
+          preparedStatement.executeUpdate();
           attackResult =
               informationMessage(this).feedback("user.created").feedbackArgs(username).build();
         }
